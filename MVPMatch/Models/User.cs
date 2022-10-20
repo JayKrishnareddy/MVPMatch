@@ -8,5 +8,6 @@
         public string? Password { get; set; }
         public long DespositAmount { get; set; }
         public string? Role { get; set; }
+        public bool isActive { get; set; } = true;
     }
 }
