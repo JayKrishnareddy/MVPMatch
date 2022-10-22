@@ -15,5 +15,6 @@
             options.UseSqlServer(Configuration.GetConnectionString("WebApiDatabase"));
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<Products> Products { get; set; }
     }
 }
