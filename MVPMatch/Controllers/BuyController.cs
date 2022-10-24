@@ -21,7 +21,7 @@ namespace MVPMatch.Controllers
                 var products = await _dataContext.Products.Select(c => c.ProductName).ToListAsync();
                 if (userInfo.Role.Equals("Buyer") && products.Contains(buyProductModel.ProductName))
                 {
-                    var userAmount = await _dataContext.DepositAccounts.Where(c => c.UserId.Equals(userInfo.UserId)).Select(c => c.Amount).ToListAsync();
+                    var userAmount = await _dataContext.DepositAccounts.Where(c => c.UserId.Equals(userInfo.UserId) && c.isActive.Equals(true)).Select(c => c.Amount).ToListAsync();
                     var productPrice = await _dataContext.Products.Where(c => c.ProductName.Equals(buyProductModel.ProductName)).Select(c => c.Price).FirstOrDefaultAsync();
                     foreach (int i in userAmount)
                     {
@@ -57,6 +57,26 @@ namespace MVPMatch.Controllers
                 throw;
             }
             
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Reset([Required] string UserName)
+        {
+            var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(UserName)).FirstOrDefaultAsync();
+            if (userInfo.Role.Equals("Buyer"))
+            {
+                var depositAccounts = await _dataContext.DepositAccounts.Where(c => c.UserId.Equals(userInfo.UserId)).ToListAsync();
+                foreach (var i in depositAccounts)
+                {
+                    i.isActive = false;
+                    await _dataContext.SaveChangesAsync();
+                }
+                return Ok("Account Reset Done !");
+            }
+            else
+            {
+                return BadRequest("User with Buyer role can only be able to reset the account");
+            }
         }
     }
 }
