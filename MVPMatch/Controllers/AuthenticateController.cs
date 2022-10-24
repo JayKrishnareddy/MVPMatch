@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using MVPMatch.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -24,7 +21,7 @@ namespace MVPMatch.Controllers
         [HttpPost(nameof(Login))]
         public async Task<IActionResult> Login([FromQuery] Login model)
         {
-            var user = await _dataContext.Users.Where(c=>c.UserName.Equals(model.Username) && c.Password.Equals(model.Password)).FirstOrDefaultAsync();
+            var user = await _dataContext.Users.Where(c => c.UserName.Equals(model.Username) && c.Password.Equals(model.Password)).FirstOrDefaultAsync();
             if (user != null)
             {
                 var authClaims = new List<Claim>

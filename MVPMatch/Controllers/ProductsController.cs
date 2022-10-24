@@ -1,8 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-using MVPMatch.Migrations;
-using MVPMatch.Models;
 using MVPMatch.ViewModels;
 
 namespace MVPMatch.Controllers
@@ -16,7 +11,7 @@ namespace MVPMatch.Controllers
             _dataContext = dataContext;
         }
         [HttpGet(nameof(GetProducts))]
-        public async Task<IActionResult> GetProducts() => Ok(await _dataContext.Products.Where(c=>c.isActive.Equals(true)).ToListAsync());
+        public async Task<IActionResult> GetProducts() => Ok(await _dataContext.Products.Where(c => c.isActive.Equals(true)).ToListAsync());
 
         [HttpPost(nameof(CreateProduct))]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel productModel)
@@ -41,7 +36,7 @@ namespace MVPMatch.Controllers
 
         }
         [HttpPut(nameof(UpdateProduct))]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductModel productModel,[Required]string userName)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductModel productModel, [Required] string userName)
         {
             var userData = await GetUserInfo(userName);
             if (userData is not null)
@@ -63,11 +58,11 @@ namespace MVPMatch.Controllers
             if (userData is not null)
             {
                 var product = await _dataContext.Products.Where(c => c.ProductName.Equals(ProductName)).FirstOrDefaultAsync();
-                product.isActive = false;               
+                product.isActive = false;
                 await _dataContext.SaveChangesAsync();
                 return NoContent();
             }
-           else return NotFound("User with Seller Role can only be able to Delete product.. Please contact Administrator");
+            else return NotFound("User with Seller Role can only be able to Delete product.. Please contact Administrator");
         }
 
         private async Task<User> GetUserInfo(string userName)
