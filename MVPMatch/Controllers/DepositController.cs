@@ -1,7 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Runtime.CompilerServices;
 
 namespace MVPMatch.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DepositController : ControllerBase

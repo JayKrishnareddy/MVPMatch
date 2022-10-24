@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using MVPMatch.ViewModels;
 
 namespace MVPMatch.Controllers
 {
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
     public class ProductsController : ControllerBase
     {
         private readonly DataContext _dataContext;

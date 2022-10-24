@@ -17,6 +17,15 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("WebApiDatabase"));
 
 });
+
+//Session Configuration
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromMinutes(5);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 builder.Services.AddSwaggerGen(swagger =>
 {
     //This is to generate the Default UI of Swagger Documentation
@@ -92,5 +101,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
+app.UseSession();
 app.Run();
