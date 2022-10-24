@@ -16,5 +16,6 @@
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Products> Products { get; set; }
+        public DbSet<DepositAccount> DepositAccounts { get; set; }
     }
 }
