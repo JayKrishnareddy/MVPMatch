@@ -13,7 +13,7 @@ namespace MVPMatch.Controllers
             _dataContext = dataContext;
         }
         [HttpPost(nameof(DepositAmountInVendingMachine))]
-        public async Task<IActionResult> DepositAmountInVendingMachine([Required] string UserName, [Required] int Amount)
+        public async Task<ActionResult> DepositAmountInVendingMachine([Required] string UserName, [Required] int Amount)
         {
             var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(c.UserName)).FirstOrDefaultAsync();
             if (Coins.Contains(Amount) && userInfo.Role.Equals("Buyer"))
