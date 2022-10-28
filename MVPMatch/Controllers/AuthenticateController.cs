@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using MVPMatch.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace MVPMatch.Controllers
@@ -51,7 +49,10 @@ namespace MVPMatch.Controllers
             }
             return Unauthorized("Please pass valid username and password!");
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         [HttpPost(nameof(Logout))]
         public async Task<IActionResult> Logout()
         {
