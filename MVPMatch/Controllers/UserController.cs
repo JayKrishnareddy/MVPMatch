@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using System.Text;
 
 namespace MVPMatch.Controllers
 {
@@ -71,9 +72,11 @@ namespace MVPMatch.Controllers
         [HttpPost]
         public async Task<OkObjectResult> PostUser(User user)
         {
+            byte[] encode = new byte[user.Password.Length];
+            encode = Encoding.UTF8.GetBytes(user.Password);
+            user.Password = Convert.ToBase64String(encode);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
             return Ok("User Details Saved!");
         }
 
