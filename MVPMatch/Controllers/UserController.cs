@@ -9,10 +9,12 @@ namespace MVPMatch.Controllers
     public class UserController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly PasswordEncryption _passwordEncryption;
 
-        public UserController(DataContext context)
+        public UserController(DataContext context, PasswordEncryption passwordEncryption)
         {
             _context = context;
+            _passwordEncryption = passwordEncryption;
         }
 
         // GET: api/User
@@ -72,9 +74,7 @@ namespace MVPMatch.Controllers
         [HttpPost]
         public async Task<OkObjectResult> PostUser(User user)
         {
-            byte[] encode = new byte[user.Password.Length];
-            encode = Encoding.UTF8.GetBytes(user.Password);
-            user.Password = Convert.ToBase64String(encode);
+            user.Password = _passwordEncryption.Encryptdata(user.Password);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return Ok("User Details Saved!");

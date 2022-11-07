@@ -12,14 +12,17 @@ namespace MVPMatch.Controllers
     {
         private readonly DataContext _dataContext;
         private readonly IConfiguration _configuration;
-        public AuthenticateController(DataContext dataContext, IConfiguration configuration)
+        private readonly PasswordEncryption _passwordEncryption;
+        public AuthenticateController(DataContext dataContext, IConfiguration configuration, PasswordEncryption passwordEncryption)
         {
             _dataContext = dataContext;
             _configuration = configuration;
+            _passwordEncryption = passwordEncryption;
         }
         [HttpPost(nameof(Login))]
         public async Task<IActionResult> Login([FromQuery] Login model)
         {
+            model.Password = _passwordEncryption.Encryptdata(model.Password);
             var user = await _dataContext.Users.Where(c => c.UserName.Equals(model.Username) && c.Password.Equals(model.Password)).FirstOrDefaultAsync();
             if (user != null)
             {

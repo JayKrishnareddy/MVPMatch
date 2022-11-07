@@ -62,6 +62,7 @@ builder.Services.AddSwaggerGen(swagger =>
                 });
 });
 builder.Services.AddScoped<DataContext>();
+builder.Services.AddScoped<PasswordEncryption>();
 
 // Adding Authentication
 builder.Services.AddAuthentication(options =>
