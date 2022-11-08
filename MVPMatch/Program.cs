@@ -79,10 +79,8 @@ builder.Services.AddAuthentication(options =>
      options.RequireHttpsMetadata = false;
      options.TokenValidationParameters = new TokenValidationParameters()
      {
-         ValidateIssuer = true,
-         ValidateAudience = true,
-         ValidAudience = configuration["JWT:ValidAudience"],
-         ValidIssuer = configuration["JWT:ValidIssuer"],
+         ValidateIssuer = false,
+         ValidateAudience = false,
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
      };
  });

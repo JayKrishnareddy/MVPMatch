@@ -19,7 +19,7 @@ namespace MVPMatch.Controllers
             try
             {
                 int Amount = 0; List<int> RemainingAmount = new();
-                var userInfo = await _dataContext.Users.FirstOrDefaultAsync(c => c.UserName.Equals(buyProductModel.UserName));
+                var userInfo = await _dataContext.Users.FirstOrDefaultAsync(c => c.UserName.Equals("user1"));
                 var products = await _dataContext.Products.Where(c=>c.isActive.Equals(true)).Select(c => c.ProductName).ToListAsync();
                 if (userInfo.Role.Equals("Buyer") && products.Contains(buyProductModel.ProductName))
                 {

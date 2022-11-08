@@ -22,7 +22,6 @@ namespace MVPTests
             {
                 ProductId = 1,
                 ProductName = "Mobile",
-                UserName = "Jay"
             };
             var okResult = _controller.Buy(buyModel);
             Assert.True(okResult.IsCompletedSuccessfully);

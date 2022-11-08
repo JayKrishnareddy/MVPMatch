@@ -34,19 +34,9 @@ namespace MVPMatch.Controllers
                 else
                 {
                     HttpContext.Session.SetString("UserName", model.Username);
-                    var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-                    authClaims.Add(new Claim(ClaimTypes.Role, user.Role));
-                    var token = GetToken(authClaims);
+                    var token = GetToken(model.Username);
 
-                    return Ok(new
-                    {
-                        token = new JwtSecurityTokenHandler().WriteToken(token),
-                        expiration = token.ValidTo
-                    });
+                    return Ok(token);
                 }
 
             }
@@ -62,20 +52,44 @@ namespace MVPMatch.Controllers
             HttpContext.Session.Clear();
             return Ok("All sessions has been terminated");
         }
-
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
+        private string GetToken(string userId)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var tokenhandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
+            var tokenDescripter = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim("id", userId) }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
+            };
+            var token = tokenhandler.CreateToken(tokenDescripter);
+            return tokenhandler.WriteToken(token);
+        }
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
+        private string ValidateToken(string token)
+        {
+            var tokenhandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
+            try
+            {
+                tokenhandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
 
-            return token;
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedtoken);
+                var jwtToken = (JwtSecurityToken)validatedtoken;
+                var userId = jwtToken.Claims.First(c => c.Type == "id").Value;
+
+                return userId;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
