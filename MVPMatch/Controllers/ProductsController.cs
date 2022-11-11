@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using MVPMatch.ViewModels;
 
-namespace MVPMatch.Controllers
-{
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProductsController : ControllerBase
+namespace MVPMatch.Controllers;
+
+    public class ProductsController : BaseController
     {
         private readonly DataContext _dataContext;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly IConfiguration _configuration;
 
-        public ProductsController(DataContext dataContext)
+        public ProductsController(DataContext dataContext, IHttpContextAccessor httpContext,IConfiguration configuration) : base(configuration,httpContext)
         {
             _dataContext = dataContext;
+            _httpContext = httpContext;
+            _configuration = configuration;
         }
         [HttpGet(nameof(GetProducts))]
         public async Task<IActionResult> GetProducts() => Ok(await _dataContext.Products.Where(c => c.isActive.Equals(true)).ToListAsync());
@@ -20,6 +21,7 @@ namespace MVPMatch.Controllers
         [HttpPost(nameof(CreateProduct))]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel productModel)
         {
+        var userName = ExtractJWTTokenFromHeader();
             var userData = await GetUserInfo(productModel.UserName);
             if (userData is not null)
             {
@@ -82,4 +84,3 @@ namespace MVPMatch.Controllers
             }
         }
     }
-}

@@ -63,12 +63,12 @@ builder.Services.AddSwaggerGen(swagger =>
 });
 builder.Services.AddScoped<DataContext>();
 builder.Services.AddScoped<PasswordEncryption>();
+builder.Services.AddHttpContextAccessor();
 
 // Adding Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 
@@ -79,8 +79,12 @@ builder.Services.AddAuthentication(options =>
      options.RequireHttpsMetadata = false;
      options.TokenValidationParameters = new TokenValidationParameters()
      {
-         ValidateIssuer = false,
-         ValidateAudience = false,
+         ValidateIssuer = true,
+         ValidateAudience = true,
+         ValidateLifetime = false,
+         ValidateIssuerSigningKey = true,
+         ValidIssuer = configuration["JWT:Issuer"],
+         ValidAudience = configuration["JWT:Audience"],
          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
      };
  });

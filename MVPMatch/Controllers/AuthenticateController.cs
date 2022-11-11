@@ -1,23 +1,25 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 using MVPMatch.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace MVPMatch.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthenticateController : ControllerBase
+namespace MVPMatch.Controllers;
+    
+    [AllowAnonymous]
+    public class AuthenticateController : BaseController
     {
         private readonly DataContext _dataContext;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContext;
         private readonly PasswordEncryption _passwordEncryption;
-        public AuthenticateController(DataContext dataContext, IConfiguration configuration, PasswordEncryption passwordEncryption)
+        public AuthenticateController(DataContext dataContext, IConfiguration configuration, PasswordEncryption passwordEncryption,IHttpContextAccessor httpContextAccessor) : base(configuration,httpContextAccessor)
         {
             _dataContext = dataContext;
             _configuration = configuration;
             _passwordEncryption = passwordEncryption;
+            _httpContext = httpContextAccessor;
         }
         [HttpPost(nameof(Login))]
         public async Task<IActionResult> Login([FromQuery] Login model)
@@ -52,44 +54,4 @@ namespace MVPMatch.Controllers
             HttpContext.Session.Clear();
             return Ok("All sessions has been terminated");
         }
-        private string GetToken(string userId)
-        {
-            var tokenhandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
-            var tokenDescripter = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", userId) }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256),
-            };
-            var token = tokenhandler.CreateToken(tokenDescripter);
-            return tokenhandler.WriteToken(token);
-        }
-
-        private string ValidateToken(string token)
-        {
-            var tokenhandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
-            try
-            {
-                tokenhandler.ValidateToken(token, new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedtoken);
-                var jwtToken = (JwtSecurityToken)validatedtoken;
-                var userId = jwtToken.Claims.First(c => c.Type == "id").Value;
-
-                return userId;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
     }
-}
