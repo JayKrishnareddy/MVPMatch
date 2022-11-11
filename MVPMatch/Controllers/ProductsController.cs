@@ -8,12 +8,13 @@ namespace MVPMatch.Controllers;
         private readonly DataContext _dataContext;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IConfiguration _configuration;
-
+        private string userName = string.Empty;
         public ProductsController(DataContext dataContext, IHttpContextAccessor httpContext,IConfiguration configuration) : base(configuration,httpContext)
         {
             _dataContext = dataContext;
             _httpContext = httpContext;
             _configuration = configuration;
+            userName = ExtractJWTTokenFromHeader();
         }
         [HttpGet(nameof(GetProducts))]
         public async Task<IActionResult> GetProducts() => Ok(await _dataContext.Products.Where(c => c.isActive.Equals(true)).ToListAsync());
@@ -21,8 +22,7 @@ namespace MVPMatch.Controllers;
         [HttpPost(nameof(CreateProduct))]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel productModel)
         {
-            var userName = ExtractJWTTokenFromHeader();
-            var userData = await GetUserInfo(userName);
+            var userData = await GetUserInfo();
             if (userData is not null)
             {
                 var product = new Products
@@ -42,9 +42,9 @@ namespace MVPMatch.Controllers;
 
         }
         [HttpPut(nameof(UpdateProduct))]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductModel productModel, [Required] string userName)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductModel productModel)
         {
-            var userData = await GetUserInfo(userName);
+            var userData = await GetUserInfo();
             if (userData is not null)
             {
                 var productinfo = await _dataContext.Products.Where(c => c.ProductName.Equals(productModel.ProductName) && c.CreatedBy.Equals(userData.UserId)).FirstOrDefaultAsync();
@@ -58,9 +58,9 @@ namespace MVPMatch.Controllers;
 
         }
         [HttpDelete(nameof(DeleteProduct))]
-        public async Task<IActionResult> DeleteProduct([Required] string ProductName, [Required] string userName)
+        public async Task<IActionResult> DeleteProduct([Required] string ProductName)
         {
-            var userData = await GetUserInfo(userName);
+            var userData = await GetUserInfo();
             if (userData is not null)
             {
                 var product = await _dataContext.Products.Where(c => c.ProductName.Equals(ProductName)).FirstOrDefaultAsync();
@@ -71,7 +71,7 @@ namespace MVPMatch.Controllers;
             else return NotFound("User with Seller Role can only be able to Delete product.. Please contact Administrator");
         }
 
-        private async Task<User> GetUserInfo(string userName)
+        private async Task<User> GetUserInfo()
         {
             var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(userName)).FirstOrDefaultAsync();
             if (!string.IsNullOrEmpty(userInfo.Role) && userInfo.Role.Equals("Seller"))

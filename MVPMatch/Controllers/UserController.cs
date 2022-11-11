@@ -3,18 +3,21 @@ using System.Text;
 
 namespace MVPMatch.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly DataContext _context;
         private readonly PasswordEncryption _passwordEncryption;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly IConfiguration _configuration;
+        private string userName = string.Empty;
 
-        public UserController(DataContext context, PasswordEncryption passwordEncryption)
+        public UserController(DataContext context, PasswordEncryption passwordEncryption, IHttpContextAccessor httpContext, IConfiguration configuration) : base(configuration, httpContext)
         {
             _context = context;
             _passwordEncryption = passwordEncryption;
+            _httpContext = httpContext;
+            _configuration = configuration;
+            userName = ExtractJWTTokenFromHeader();
         }
 
         // GET: api/User

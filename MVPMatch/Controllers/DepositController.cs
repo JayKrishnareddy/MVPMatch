@@ -1,23 +1,23 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System.Runtime.CompilerServices;
-
-namespace MVPMatch.Controllers
+﻿namespace MVPMatch.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class DepositController : ControllerBase
+    public class DepositController : BaseController
     {
         private readonly DataContext _dataContext;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly IConfiguration _configuration;
+        private string userName = string.Empty;
         int[] Coins = { 5, 10, 20, 50, 100 };
-        public DepositController(DataContext dataContext)
+        public DepositController(DataContext dataContext, IHttpContextAccessor httpContext, IConfiguration configuration) : base(configuration, httpContext)
         {
             _dataContext = dataContext;
+            _httpContext = httpContext;
+            _configuration = configuration;
+            userName = ExtractJWTTokenFromHeader();
         }
         [HttpPost(nameof(DepositAmountInVendingMachine))]
-        public async Task<ActionResult> DepositAmountInVendingMachine([Required] string UserName, [Required] int Amount)
+        public async Task<ActionResult> DepositAmountInVendingMachine([Required] int Amount)
         {
-            var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(c.UserName)).FirstOrDefaultAsync();
+            var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(userName)).FirstOrDefaultAsync();
             if (Coins.Contains(Amount) && userInfo.Role.Equals("Buyer"))
             {
                 var deposit = new DepositAccount

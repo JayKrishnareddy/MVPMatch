@@ -3,15 +3,18 @@ using MVPMatch.ViewModels;
 
 namespace MVPMatch.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class BuyController : ControllerBase
+    public class BuyController : BaseController
     {
         private readonly DataContext _dataContext;
-        public BuyController(DataContext dataContext)
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly IConfiguration _configuration;
+        private string userName = string.Empty;
+        public BuyController(DataContext dataContext, IHttpContextAccessor httpContext, IConfiguration configuration) : base(configuration, httpContext)
         {
             _dataContext = dataContext;
+            _httpContext = httpContext;
+            _configuration = configuration;
+            userName = ExtractJWTTokenFromHeader();
         }
         [HttpPost]
         public async Task<IActionResult> Buy([Required][FromBody] BuyProductModel buyProductModel)
@@ -19,7 +22,7 @@ namespace MVPMatch.Controllers
             try
             {
                 int Amount = 0; List<int> RemainingAmount = new();
-                var userInfo = await _dataContext.Users.FirstOrDefaultAsync(c => c.UserName.Equals("user1"));
+                var userInfo = await _dataContext.Users.FirstOrDefaultAsync(c => c.UserName.Equals(userName));
                 var products = await _dataContext.Products.Where(c=>c.isActive.Equals(true)).Select(c => c.ProductName).ToListAsync();
                 if (userInfo.Role.Equals("Buyer") && products.Contains(buyProductModel.ProductName))
                 {
@@ -62,9 +65,9 @@ namespace MVPMatch.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Reset([Required] string UserName)
+        public async Task<IActionResult> Reset()
         {
-            var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(UserName)).FirstOrDefaultAsync();
+            var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(userName)).FirstOrDefaultAsync();
             if (userInfo.Role.Equals("Buyer"))
             {
                 var depositAccounts = await _dataContext.DepositAccounts.Where(c => c.UserId.Equals(userInfo.UserId)).ToListAsync();
