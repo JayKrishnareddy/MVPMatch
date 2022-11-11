@@ -21,8 +21,8 @@ namespace MVPMatch.Controllers;
         [HttpPost(nameof(CreateProduct))]
         public async Task<IActionResult> CreateProduct([FromBody] ProductModel productModel)
         {
-        var userName = ExtractJWTTokenFromHeader();
-            var userData = await GetUserInfo(productModel.UserName);
+            var userName = ExtractJWTTokenFromHeader();
+            var userData = await GetUserInfo(userName);
             if (userData is not null)
             {
                 var product = new Products
