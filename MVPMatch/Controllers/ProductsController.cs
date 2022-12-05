@@ -74,13 +74,6 @@ namespace MVPMatch.Controllers;
         private async Task<User> GetUserInfo()
         {
             var userInfo = await _dataContext.Users.Where(c => c.UserName.Equals(userName)).FirstOrDefaultAsync();
-            if (!string.IsNullOrEmpty(userInfo.Role) && userInfo.Role.Equals("Seller"))
-            {
-                return userInfo;
-            }
-            else
-            {
-                return null;
-            }
+            return (!string.IsNullOrEmpty(userInfo.Role) && userInfo.Role.Equals("Seller")) ? userInfo : null;
         }
     }
