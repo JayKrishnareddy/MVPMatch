@@ -23,11 +23,11 @@ namespace MVPMatch.Controllers
             {
                 int Amount = 0; List<int> RemainingAmount = new();
                 var userInfo = await _dataContext.Users.FirstOrDefaultAsync(c => c.UserName.Equals(userName));
-                var products = await _dataContext.Products.Where(c=>c.isActive.Equals(true)).Select(c => c.ProductName).ToListAsync();
-                if (userInfo.Role.Equals("Buyer") && products.Contains(buyProductModel.ProductName))
+                var products = await _dataContext.Products.Where(c=>c.isActive.Equals(true)).Select(c => c.ProductId).ToListAsync();
+                if (userInfo.Role.Equals("Buyer") && products.Contains(buyProductModel.ProductId))
                 {
                     var userAmount = await _dataContext.DepositAccounts.Where(c => c.UserId.Equals(userInfo.UserId) && c.isActive.Equals(true)).Select(c => c.Amount).ToListAsync();
-                    var productPrice = await _dataContext.Products.Where(c => c.ProductName.Equals(buyProductModel.ProductName)).Select(c => c.Price).FirstOrDefaultAsync();
+                    var productPrice = await _dataContext.Products.Where(c => c.ProductName.Equals(buyProductModel.ProductId)).Select(c => c.Price).FirstOrDefaultAsync();
                     foreach (int i in userAmount)
                     {
                         if(productPrice > Amount)

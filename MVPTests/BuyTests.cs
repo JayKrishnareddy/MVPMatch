@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MVPMatch;
 using MVPMatch.Models;
 using MVPMatch.ViewModels;
@@ -9,11 +12,13 @@ namespace MVPTests
     {
         private readonly BuyController _controller;
         private readonly DataContext dataContext;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContext;
 
         public BuyTests()
         {
             dataContext = GetDatabaseContext();
-            _controller = new BuyController(dataContext);
+            _controller = new BuyController(dataContext,_httpContext,_configuration);
         }
         [Fact]
         public void Buy_API_WhenCalled_ReturnsOkResult()

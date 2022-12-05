@@ -9,7 +9,6 @@ namespace MVPMatch.Controllers
         private readonly PasswordEncryption _passwordEncryption;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IConfiguration _configuration;
-        private string userName = string.Empty;
 
         public UserController(DataContext context, PasswordEncryption passwordEncryption, IHttpContextAccessor httpContext, IConfiguration configuration) : base(configuration, httpContext)
         {
@@ -17,7 +16,6 @@ namespace MVPMatch.Controllers
             _passwordEncryption = passwordEncryption;
             _httpContext = httpContext;
             _configuration = configuration;
-            userName = ExtractJWTTokenFromHeader();
         }
 
         // GET: api/User
@@ -73,7 +71,6 @@ namespace MVPMatch.Controllers
         }
         [AllowAnonymous]
         // POST: api/User
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<OkObjectResult> PostUser(User user)
         {
