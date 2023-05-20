@@ -38,7 +38,6 @@ namespace MVPMatch.Controllers
                         {
                             RemainingAmount.Add(i);
                         }
-                        
                     }
                     if (Amount >= productPrice)
                     {
@@ -48,7 +47,7 @@ namespace MVPMatch.Controllers
                             ProductsPurchased = new BuyProductModel
                             {
                                 ProductId = buyProductModel.ProductId,
-                                ProductName = buyProductModel.ProductName
+                                AmountofProducts = buyProductModel.AmountofProducts
                             },
                             RemainingCents = RemainingAmount.ToArray()
                         });
